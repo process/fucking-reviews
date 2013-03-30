@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>FUCKING GAME REVIEWS</title>
+<style>
+body {
+	background-color:  black;
+	color: white;
+	font-family: Helvetica, Arial, sans-serif;
+	text-shadow: 0 0 2.5px white;
+}
+
+div {
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.review-container {
+	margin-bottom: 20px;
+}
+
+.game-title {
+	font-size: x-large;
+}
+
+.review {
+	margin-left: 10px;
+}
+
+.good {
+	color: lightgreen;
+}
+
+.avg {
+	color: yellow;
+}
+
+.bad {
+	color: red;
+}
+</style>
+</head>
+<body>
+<div>
+<h1>FUCKING GAME REVIEWS</h1>
+{% for game in games %}
+<div class="review-container">
+<span class="game-title">{{ game['title'] }}</span><br />
+<span class="review">IT'S FUCKING <span class="{{ game['css_class'] }}">{{ game['adj'] }}</span></span>
+</div>
+{% endfor %}
+<div>
+</body>
+</html>

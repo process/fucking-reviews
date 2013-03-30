@@ -1,43 +1,64 @@
+import os
+from threading import Timer
 from urllib2 import urlopen
 from bs4 import BeautifulSoup
+from flask import Flask
+from jinja2 import Template
 
-out_file = open("index.html", 'w')
+# Create jinja2 template from file
+with open("template.html", 'r') as f:
+    template = Template(f.read())
 
-out_file.write("""
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>FUCKING GAME REVIEWS</title>
-</head>
-<body>
-<h1>FUCKING GAME REVIEWS</h1>""")
+# Initialize at global scope
+page_data = ""
 
-data = BeautifulSoup(urlopen("http://www.metacritic.com/browse/games/score/metascore/90day/all").read())
-game_list = data.select(".list_product_condensed")[0]
-games = game_list.select(".product")
+# Get data from metacritic and fill in template
+def update_page():
+  data = BeautifulSoup(urlopen("http://www.metacritic.com/browse/games/score/metascore/90day/all").read())
+  game_list = data.select(".list_product_condensed")[0]
+  games = game_list.select(".product")
 
-for game in games:
-  title = game.a.string
-  score = game.select(".textscore")[0].string
+  review_data = []
 
-  if score == "tbd":
-    continue # Ignore unreviewed games
-  else:
-    score = float(score)
-  
-  if score >= 7.5:
-    adj = "GOOD"
-  elif score >= 5:
-    adj = "...ALRIGHT"
-  else:
-    adj = "SHIT"
+  for game in games:
+    review = {}
+    score = game.select(".textscore")[0].string
 
-  out_file.write("""
-  <h3>%s</h3>
-  IT'S FUCKING %s""" % (title, adj))
+    if score == "tbd":
+      continue # Ignore unreviewed games
+    else:
+      score = float(score)
+    
+    if score >= 7.5:
+      adj = "GOOD"
+      css_class = "good"
+    elif score >= 5:
+      adj = "...ALRIGHT"
+      css_class = "avg"
+    else:
+      adj = "SHIT"
+      css_class = "bad"
 
-out_file.write("""
-</body>
-</html>""")
+    review['title'] = game.a.string
+    review['score'] = score
+    review['adj'] = adj
+    review['css_class'] = css_class
 
+    review_data.append(review)
+
+  global page_data
+  page_data = template.render(games=review_data)
+  Timer(2, update_page)
+
+# Create flask app with routes
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+  return page_data
+
+if __name__ == '__main__':
+  # Bind to PORT if defined, otherwise default to 8000
+  update_page()
+  port = int(os.environ.get('PORT', 8000))
+  app.run(port=port)
