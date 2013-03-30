@@ -14,6 +14,7 @@ page_data = ""
 
 # Get data from metacritic and fill in template
 def update_page():
+  print "updating page"
   data = BeautifulSoup(urlopen("http://www.metacritic.com/browse/games/score/metascore/90day/all").read())
   game_list = data.select(".list_product_condensed")[0]
   games = game_list.select(".product")
@@ -48,7 +49,7 @@ def update_page():
 
   global page_data
   page_data = template.render(games=review_data)
-  Timer(2, update_page)
+  Timer(2, update_page).start()
 
 # Create flask app with routes
 app = Flask(__name__)
