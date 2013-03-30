@@ -16,7 +16,7 @@ page_data = ""
 def update_page():
   print "updating page"
   data = BeautifulSoup(urlopen("http://www.metacritic.com/browse/games/score/metascore/90day/all").read())
-  game_list = data.select(".list_product_condensed")[0]
+  game_list = data.select(".list_products")[0]
   games = game_list.select(".product")
 
   review_data = []
@@ -41,6 +41,7 @@ def update_page():
       css_class = "bad"
 
     review['title'] = game.a.string
+    review['platform'] = game.a['href'].split('/')[-2]
     review['score'] = score
     review['adj'] = adj
     review['css_class'] = css_class
@@ -49,7 +50,7 @@ def update_page():
 
   global page_data
   page_data = template.render(games=review_data)
-  Timer(2, update_page).start()
+  Timer(600, update_page).start()
 
 # Create flask app with routes
 app = Flask(__name__)

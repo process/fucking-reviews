@@ -22,11 +22,16 @@ div {
 }
 
 .game-title {
-	font-size: x-large;
+	font-size: xx-large;
 }
 
 .review {
 	margin-left: 10px;
+	font-size: x-large;
+}
+
+.score {
+	font-size: small;
 }
 
 .good {
@@ -47,8 +52,10 @@ div {
 <h1>FUCKING GAME REVIEWS</h1>
 {% for game in games %}
 <div class="review-container">
-<span class="game-title">{{ game['title'] }}</span><br />
-<span class="review">IT'S FUCKING <span class="{{ game['css_class'] }}">{{ game['adj'] }}</span></span>
+	<span class="game-title">{{ game['title'] }}</span> ({{ game['platform'] }})<br />
+	<div class="review">
+		IT'S FUCKING <span class="{{ game['css_class'] }}">{{ game['adj'] }}</span><br /><span class="score">Metacritic user score: {{ game['score'] }}/10</span>
+	</div>
 </div>
 {% endfor %}
 <div>
